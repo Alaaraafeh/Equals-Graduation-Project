@@ -8,6 +8,7 @@ const { find } = require('../models/jopseeker');
 const { post } = require('../routes/jopseeker');
 const { uploadImageToCloudinary } = require('../util/uploadImage');
 const mongoose = require("mongoose");
+const axios = require("axios")
 
 
 exports.getNewUser = async (req, res, next) => {
@@ -222,3 +223,31 @@ exports.deletePost = async(req, res, next) => {
     }
 
 }
+
+exports.recommendCvs = async (req, res, next) => {
+    const comparePayload = {
+        //jobs_skills: req.body.jobsSkills  
+        //employees_skills: req.body.employeeSkills,  
+
+        jobs_skills: ["jobs"], 
+        employees_skills: ["employee_1", "employee_2", "employee_3"] 
+    };
+
+    try {
+        const response = await axios.post('https://zayanomar5-omarz.hf.space/compare', comparePayload, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        res.status(200).json({
+            message: "post compared successfully!",
+            skillsComparison: response.data
+        });
+    } catch (error) {
+        if (!error.statusCode) {
+            error.statusCode = 500;
+        }
+        next(error);
+    }
+};
