@@ -2,6 +2,11 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const cvSchema = new Schema({
+    jobSeeker: { 
+        type: Schema.Types.ObjectId,
+        ref: 'JobSeeker',
+        required: true
+    },
     email: {
         type: String
     },

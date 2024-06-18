@@ -73,14 +73,17 @@ exports.postAddUser = async (req, res, next) => {
 };
 
 exports.createCv = async (req, res, next) => {
+    const jobSeekerId = req.userId;
+    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         const error = new Error('Validation failed, the data is incorrect')
         error.statusCode = 422;
         throw error;
     }
-
+    
     const cv = new Cv({
+        jobSeeker: jobSeekerId,
         jobTitle: req.body.jobTitle,
         jobLocation: req.body.jobLocation,
         email: req.body.email,
@@ -93,17 +96,19 @@ exports.createCv = async (req, res, next) => {
         skills: req.body.skills,
         strength: req.body.strength
     });
-
+    
     try {
         await cv.save()
         res.status(201).json({
             message: "CV created successfully!",
             cvId: cv._id,
         })
-
-        const cv_body = {
+        
+        const Cv_body = {
             cv_body:`${cv.jobTitle} ${cv.jobLocation} ${cv.personalStatement.descPersonal} ${cv.skills.skill} ${cv.skills.experience} ${cv.employmentHistory.historyJobTitle}`
         }
+        console.log("wating for analysis");
+        const cv_body = JSON.stringify(Cv_body);
         //const cv_body = {
         //    cv_body: "I am a highly motivated and results-oriented software engineer with a strong work ethic and a proven track record of developing and maintaining high-quality software applications. I possess a unique blend of in Python, Java, web development, and machine learning. I am adept at designing, implementing, and testing software solutions to meet business requirements. I am confident that I can contribute to your team by developing innovative features, optimizing performance, and improving code quality."
         //};
