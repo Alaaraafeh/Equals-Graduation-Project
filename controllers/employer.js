@@ -229,7 +229,7 @@ exports.recommendCvs = async (req, res, next) => {
         //jobs_skills: req.body.jobsSkills  
         //employees_skills: req.body.employeeSkills,  
 
-        jobs_skills: ["jobs"], 
+        jobs_skills: ["jobs"], // from front req.body.jobDescription 
         employees_skills: ["employee_1", "employee_2", "employee_3"] 
     };
 

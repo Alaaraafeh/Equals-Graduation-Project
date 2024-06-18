@@ -82,7 +82,7 @@ exports.createCv = async (req, res, next) => {
 
     const cv = new Cv({
         jobTitle: req.body.jobTitle,
-        location: req.body.location,
+        jobLocation: req.body.jobLocation,
         email: req.body.email,
         personalStatement: req.body.personalStatement,
         employmentHistory: req.body.employmentHistory,
@@ -96,11 +96,17 @@ exports.createCv = async (req, res, next) => {
 
     try {
         await cv.save()
+        res.status(201).json({
+            message: "CV created successfully!",
+            cvId: cv._id,
+        })
 
-        // const cv_body = req.body.cv_body
         const cv_body = {
-            cv_body: "I am a highly motivated and results-oriented software engineer with a strong work ethic and a proven track record of developing and maintaining high-quality software applications. I possess a unique blend of in Python, Java, web development, and machine learning. I am adept at designing, implementing, and testing software solutions to meet business requirements. I am confident that I can contribute to your team by developing innovative features, optimizing performance, and improving code quality."
-        };
+            cv_body:`${cv.jobTitle} ${cv.jobLocation} ${cv.personalStatement.descPersonal} ${cv.skills.skill} ${cv.skills.experience} ${cv.employmentHistory.historyJobTitle}`
+        }
+        //const cv_body = {
+        //    cv_body: "I am a highly motivated and results-oriented software engineer with a strong work ethic and a proven track record of developing and maintaining high-quality software applications. I possess a unique blend of in Python, Java, web development, and machine learning. I am adept at designing, implementing, and testing software solutions to meet business requirements. I am confident that I can contribute to your team by developing innovative features, optimizing performance, and improving code quality."
+        //};
 
         const response = await axios.post('https://zayanomar5-omar.hf.space/cv', cv_body, {
             headers: {
@@ -108,15 +114,20 @@ exports.createCv = async (req, res, next) => {
             }
         });
 
-        res.status(201).json({
-            message: "CV created successfully!",
-            cvId: cv._id,
-            cvAnalysis : response.data
-        })
+        // res.status(201).json({
+        //     message: "CV created successfully!",
+        //     cvId: cv._id,
+        //     cvAnalysis : response.data
+        // })
+
+        // save in databas response.data
+        cv.cvAnalysis = response.data;
+        await cv.save();
+        console.log("cv analysis successfully")
 
     } catch (err) {
-        if (!error.statusCode) {
-            error.statusCode = 500;
+        if (!err.statusCode) {
+            err.statusCode = 500;
         }
         next(err);
     }

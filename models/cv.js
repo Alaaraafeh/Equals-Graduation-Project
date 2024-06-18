@@ -107,7 +107,11 @@ const cvSchema = new Schema({
         descrStrengh:{
             type: String
         }
-    } 
+    },
+
+    cvAnalysis: {
+        type: Schema.Types.Mixed
+    }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Cv', cvSchema);
