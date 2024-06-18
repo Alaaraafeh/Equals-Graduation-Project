@@ -15,4 +15,6 @@ router.get('/Home', (req, res) => {
     res.send('Home Page');
 });
 
+router.get("/getuser/:userId", userController.getUser);
+
 module.exports = router;

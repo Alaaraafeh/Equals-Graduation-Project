@@ -4,10 +4,22 @@ const { validationResult } = require('express-validator');
 const axios = require('axios');
 const Cv = require("../models/cv");
 
-
-exports.getNewUser = async (req, res, next) => {
-    res.status(200).json({ page: "jopseeker registration page" })
-};
+/*
+exports.getJopseeker = async (req, res, next) => {
+    const userId = req.params.userId;
+    try {
+        console.log(userId)
+        const findUser = await Jopseeker.findById(userId);
+        if (!findUser) {
+            const error = new Error("not find user.");
+            error.statusCode = 404;
+            throw error;
+        }
+        res.status(200).json({ message: 'user fetched.', user: findUser });
+    } catch (err) {
+        next(err);
+    }
+}*/
 
 exports.postAddUser = async (req, res, next) => {
     const firstName = req.body.firstName;

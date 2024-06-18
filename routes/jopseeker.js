@@ -6,7 +6,7 @@ const { body } = require("express-validator");
 
 const router = express.Router();
 
-router.get("/Registration", jopseekerController.getNewUser);
+ //router.get("/Registration", jopseekerController.getNewUser);
 
 router.post('/Registration', [
     // Validation for first name
@@ -66,6 +66,8 @@ router.post("/CreateCv", isAuth, jopseekerController.createCv);
 
 router.get("/Cv/:cvId", jopseekerController.getCv);
 
+//router.get("/user/:userId", jopseekerController.getJopseeker);
+
 router.get('/users/:userId/cv/:cvId', jopseekerController.getCvForUser);
 
 router.delete("/Delete/:cvId", jopseekerController.deleteCv);
@@ -73,8 +75,6 @@ router.delete("/Delete/:cvId", jopseekerController.deleteCv);
 router.post("/Edit/:cvId", jopseekerController.editCv);
 
 router.post("/Recommendation", jopseekerController.recommendJops);
-
-
 
 
 

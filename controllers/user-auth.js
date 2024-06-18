@@ -44,3 +44,26 @@ exports.logIn = async (req, res, next) => {
         }
     }
 };
+
+exports.getUser = async (req, res, next) => {
+    const userId = req.params.userId;
+    try {
+        const findUser1 = await Jopseeker.findById(userId);
+        const findUser2 = await Employer.findById(userId);
+        let user;
+        if (findUser1) {
+            user = findUser1;
+        } else if (findUser2) {
+            user = findUser2;
+        }
+        if (!user) {
+            const error = new Error('User not found');
+            error.statusCode = 401;
+            throw error;
+        };
+        res.status(200).json({ message: 'user fetched.', user: user });
+    } catch (err) {
+        next(err);
+    }
+}
+ 
