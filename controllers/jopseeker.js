@@ -3,6 +3,7 @@ const Jopseeker = require("../models/jopseeker");
 const { validationResult } = require('express-validator');
 const axios = require('axios');
 const Cv = require("../models/cv");
+const Post = require("../models/post");
 
 
 exports.postAddUser = async (req, res, next) => {
@@ -89,26 +90,19 @@ exports.createCv = async (req, res, next) => {
             cvId: cv._id,
         })
         
+        //    cv_body: "I am a highly motivated and results-oriented software engineer with a strong work ethic and a proven track record of developing and maintaining high-quality software applications. I possess a unique blend of in Python, Java, web development, and machine learning. I am adept at designing, implementing, and testing software solutions to meet business requirements. I am confident that I can contribute to your team by developing innovative features, optimizing performance, and improving code quality."
         const Cv_body = {
             cv_body:`${cv.jobTitle} ${cv.jobLocation} ${cv.personalStatement.descPersonal} ${cv.skills.skill} ${cv.skills.experience} ${cv.employmentHistory.historyJobTitle}`
         }
+
         console.log("wating for analysis");
         const cv_body = JSON.stringify(Cv_body);
-        //const cv_body = {
-        //    cv_body: "I am a highly motivated and results-oriented software engineer with a strong work ethic and a proven track record of developing and maintaining high-quality software applications. I possess a unique blend of in Python, Java, web development, and machine learning. I am adept at designing, implementing, and testing software solutions to meet business requirements. I am confident that I can contribute to your team by developing innovative features, optimizing performance, and improving code quality."
-        //};
 
         const response = await axios.post('https://zayanomar5-omar.hf.space/cv', cv_body, {
             headers: {
                 'Content-Type': 'application/json'
             }
         });
-
-        // res.status(201).json({
-        //     message: "CV created successfully!",
-        //     cvId: cv._id,
-        //     cvAnalysis : response.data
-        // })
 
         // save in databas response.data
         cv.cvAnalysis = response.data;
@@ -227,15 +221,39 @@ exports.deleteCv = async (req, res, next) => {
 
 }
 
-exports.recommendJops = async (req, res, next) => {
-    const comparePayload = {
-        //employee_skills: req.body.employeeSkills,  
-        //jobs_skills: req.body.jobsSkills  
-        employee_skills: "Employee skills list",  
-        jobs_skills: ["Job skills list 1", "Job skills list 2", "..."]
-    };
 
+
+exports.recommendJops = async (req, res, next) => {
     try {
+      //  const jobSeekerId = req.userId; // Assuming the user ID is stored in the request
+      //  const jobSeeker = await Jopseeker.findById(jobSeekerId);
+
+      const cvId = req.params.cvId; // Assuming the user ID is stored in the request
+      const cv = await Cv.findById(cvId);
+
+        if (!cv) {
+            const error = new Error('Job seeker not found.');
+            error.statusCode = 404;
+            throw error;
+        }
+
+        const cvAnalysis = cv.cvAnalysis.skills;
+      //  const cvAnalysis = JSON.parse(jobSeeker.cvAnalysis);
+
+        if (!cvAnalysis) {
+            const error = new Error('CV analysis not found.');
+            error.statusCode = 404;
+            throw error;
+        }
+
+        const jobPosts = await Post.find({});
+        const allJobDescriptions = jobPosts.map(jobPost => jobPost.jobDescription);
+
+        const comparePayload = {
+            employee_skills: cvAnalysis,  // cv analysis
+            jobs_skills: allJobDescriptions // job descriptions
+        };
+
         const response = await axios.post('https://zayanomar5-omar.hf.space/compare', comparePayload, {
             headers: {
                 'Content-Type': 'application/json'
@@ -253,3 +271,40 @@ exports.recommendJops = async (req, res, next) => {
         next(error);
     }
 };
+
+
+
+
+
+// exports.recommendJops = async (req, res, next) => {
+//     console.log(Jopseeker.cvAnalysis);
+
+//     const jobPosts = await Post.find({});
+//     const allJobDescriptions = jobPosts.map(jobPost => jobPost.jobDescription);
+    
+//     console.log(allJobDescriptions);
+//     const comparePayload = {
+//         //employee_skills: req.body.employeeSkills,  
+//         //jobs_skills: req.body.jobsSkills  
+//         employee_skills: Jopseeker.cvAnalysis,  //cv analysis
+//         jobs_skills: allJobDescriptions //["Job skills list 1", "Job skills list 2", "..."]  // jop description
+//     };
+
+//     try {
+//         const response = await axios.post('https://zayanomar5-omar.hf.space/compare', comparePayload, {
+//             headers: {
+//                 'Content-Type': 'application/json'
+//             }
+//         });
+
+//         res.status(200).json({
+//             message: "Skills compared successfully!",
+//             skillsComparison: response.data
+//         });
+//     } catch (error) {
+//         if (!error.statusCode) {
+//             error.statusCode = 500;
+//         }
+//         next(error);
+//     }
+// };

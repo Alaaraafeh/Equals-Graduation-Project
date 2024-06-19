@@ -72,7 +72,7 @@ router.delete("/Delete/:cvId", jopseekerController.deleteCv);
 
 router.post("/Edit/:cvId", jopseekerController.editCv);
 
-router.post("/Recommendation", jopseekerController.recommendJops);
+router.post("/Recommendation/:cvId", jopseekerController.recommendJops);
 
 
 

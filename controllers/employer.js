@@ -228,7 +228,7 @@ exports.recommendCvs = async (req, res, next) => {
         //employees_skills: req.body.employeeSkills,  
 
         jobs_skills: ["jobs"], // from front req.body.jobDescription 
-        employees_skills: ["employee_1", "employee_2", "employee_3"] 
+        employees_skills: ["employee_1", "employee_2", "employee_3"] // cv analysis
     };
 
     try {
