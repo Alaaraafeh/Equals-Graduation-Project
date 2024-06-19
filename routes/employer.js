@@ -83,7 +83,7 @@ router.put('/editPost/:postId', upload.single('image') , employerController.edit
 
 router.delete('/post/:postId', employerController.deletePost);
 
-router.post("/Recommendation", employerController.recommendCvs);
+router.post("/Recommendation/:postId", employerController.recommendCvs);
 
 
 

@@ -8,7 +8,8 @@ const { find } = require('../models/jopseeker');
 const { post } = require('../routes/jopseeker');
 const { uploadImageToCloudinary } = require('../util/uploadImage');
 const mongoose = require("mongoose");
-const axios = require("axios")
+const axios = require("axios");
+const Cv = require("../models/cv")
 
 
 exports.getNewUser = async (req, res, next) => {
@@ -222,7 +223,112 @@ exports.deletePost = async(req, res, next) => {
     }
 }
 
+
+
 exports.recommendCvs = async (req, res, next) => {
+    try {
+      const postId = req.params.postId; // Assuming the user ID is stored in the request
+      const post = await Post.findById(postId);
+
+      if (!post) {
+        const error = new Error('Job post not found.');
+        error.statusCode = 404;
+        throw error;
+    }
+
+      const postDescripion = post.jobDescription;
+
+        if (!postDescripion) {
+            const error = new Error('jop description not found.');
+            error.statusCode = 404;
+            throw error;
+        }
+
+        const cvs = await Cv.find({});
+
+        if (!cvs.length) {
+            const error = new Error('No CVs found.');
+            error.statusCode = 404;
+            throw error;
+        }
+
+        const cvsWithSkills = [];
+
+        for (const cv of cvs) {
+            if (cv.cvAnalysis && cv.cvAnalysis.skills) {
+                cvsWithSkills.push({
+                    _id: cv._id,
+                    skills: cv.cvAnalysis.skills
+                });
+            }
+        }
+
+        if (!cvsWithSkills.length) {
+            const error = new Error('No CVs with skills found.');
+            error.statusCode = 404;
+            throw error;
+        }
+
+        const comparePayload = {
+            jobs_skills: [postDescripion],
+            employees_skills: cvsWithSkills.map(cv => cv.skills)
+        };
+
+        const response = await axios.post('https://zayanomar5-omarz.hf.space/compare', comparePayload, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        res.status(200).json({
+            message: "Post compared successfully!",
+            skillsComparison: response.data,
+            cvs: cvsWithSkills
+        });
+
+        // //const allJobseekerCv = cvs.map(cv => cv.cvAnalysis.skills);
+
+        // const allJobseekerCv = cvs.map(cv => {
+        //     // Ensure cvAnalysis and skills are defined
+        //     if (cv.cvAnalysis && cv.cvAnalysis.skills) {
+        //         return cv.cvAnalysis.skills;
+        //     } else {
+        //         return null;
+        //     }
+        // }).filter(skills => skills !== null);
+
+
+        // if (!allJobseekerCv.length) {
+        //     const error = new Error('No CVs with skills found.');
+        //     error.statusCode = 404;
+        //     throw error;
+        // }
+
+        // const comparePayload = {
+        //     jobs_skills: [postDescripion], 
+        //     employees_skills: allJobseekerCv
+        // };
+
+        // const response = await axios.post('https://zayanomar5-omarz.hf.space/compare', comparePayload, {
+        //     headers: {
+        //         'Content-Type': 'application/json'
+        //     }
+        // });
+
+        // res.status(200).json({
+        //     message: "post compared successfully!",
+        //     skillsComparison: response.data
+        // });
+    } catch (error) {
+        if (!error.statusCode) {
+            error.statusCode = 500;
+        }
+        next(error);
+    }
+};
+
+
+/*exports.recommendCvs = async (req, res, next) => {
     const comparePayload = {
         //jobs_skills: req.body.jobsSkills  
         //employees_skills: req.body.employeeSkills,  
@@ -248,4 +354,4 @@ exports.recommendCvs = async (req, res, next) => {
         }
         next(error);
     }
-};
+};*/
