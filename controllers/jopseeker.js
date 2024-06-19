@@ -4,22 +4,6 @@ const { validationResult } = require('express-validator');
 const axios = require('axios');
 const Cv = require("../models/cv");
 
-/*
-exports.getJopseeker = async (req, res, next) => {
-    const userId = req.params.userId;
-    try {
-        console.log(userId)
-        const findUser = await Jopseeker.findById(userId);
-        if (!findUser) {
-            const error = new Error("not find user.");
-            error.statusCode = 404;
-            throw error;
-        }
-        res.status(200).json({ message: 'user fetched.', user: findUser });
-    } catch (err) {
-        next(err);
-    }
-}*/
 
 exports.postAddUser = async (req, res, next) => {
     const firstName = req.body.firstName;
@@ -71,6 +55,7 @@ exports.postAddUser = async (req, res, next) => {
         res.status(500).send("Something went wrong. Please try again later.");
     }
 };
+
 
 exports.createCv = async (req, res, next) => {
     const jobSeekerId = req.userId;
@@ -198,23 +183,25 @@ exports.getCv = async (req, res, next) => {
 }
 
 
-exports.getCvForUser = async (req, res, next) => {
-    const userId = req.params.userId; 
-    const cvId = req.params.cvId;     
+exports.getCvsForJobSeeker = async (req, res, next) => {
+    const jobSeekerId = req.params.jobSeekerId; 
     try {
-        // Find the CV by ID and user ID
-        const findCv = await Cv.findOne({ _id: cvId, userId: userId });
-        if (!findCv) {
-            const error = new Error("CV not found for the specified user.");
+        const cvs = await Cv.find({ jobSeeker: jobSeekerId });
+        
+        if (!cvs) {
+            const error = new Error('No CVs found for this job seeker.');
             error.statusCode = 404;
             throw error;
         }
-        res.status(200).json({ message: 'CV fetched successfully.', cv: findCv });
+
+        res.status(200).json({message: 'CV fetched successfully.', cv: cvs });
     } catch (err) {
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
         next(err);
     }
-}
-
+};
 
 
 exports.deleteCv = async (req, res, next) => {

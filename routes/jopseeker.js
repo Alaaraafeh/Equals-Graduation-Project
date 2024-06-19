@@ -66,9 +66,7 @@ router.post("/CreateCv", isAuth, jopseekerController.createCv);
 
 router.get("/Cv/:cvId", jopseekerController.getCv);
 
-//router.get("/user/:userId", jopseekerController.getJopseeker);
-
-router.get('/users/:userId/cv/:cvId', jopseekerController.getCvForUser);
+router.get('/cvs/:jobSeekerId', jopseekerController.getCvsForJobSeeker);
 
 router.delete("/Delete/:cvId", jopseekerController.deleteCv);
 

@@ -202,7 +202,6 @@ exports.editPost = async (req, res, next) => {
     } catch (err) {
         next(err);
     }
-
 };
 
 
@@ -221,7 +220,6 @@ exports.deletePost = async(req, res, next) => {
     } catch (err) {
         next(err)
     }
-
 }
 
 exports.recommendCvs = async (req, res, next) => {
