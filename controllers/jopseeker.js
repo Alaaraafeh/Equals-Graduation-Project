@@ -247,11 +247,22 @@ exports.recommendJops = async (req, res, next) => {
         }
 
         const jobPosts = await Post.find({});
+        if (!jobPosts.length) {
+            const error = new Error('No job posts found.');
+            error.statusCode = 404;
+            throw error;
+        }
+
+        const jobPostsWithIds = jobPosts.map(jobPost => ({
+            _id: jobPost._id,
+            jobDescription: jobPost.jobDescription
+        }));
+
         const allJobDescriptions = jobPosts.map(jobPost => jobPost.jobDescription);
 
         const comparePayload = {
-            employee_skills: cvAnalysis,  // cv analysis
-            jobs_skills: allJobDescriptions // job descriptions
+            employee_skills: cvAnalysis,
+            jobs_skills: allJobDescriptions
         };
 
         const response = await axios.post('https://zayanomar5-omar.hf.space/compare', comparePayload, {
@@ -262,7 +273,8 @@ exports.recommendJops = async (req, res, next) => {
 
         res.status(200).json({
             message: "Skills compared successfully!",
-            skillsComparison: response.data
+            skillsComparison: response.data,
+            jobPosts: jobPostsWithIds
         });
     } catch (error) {
         if (!error.statusCode) {
