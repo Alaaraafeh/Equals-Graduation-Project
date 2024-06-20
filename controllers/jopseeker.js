@@ -225,9 +225,6 @@ exports.deleteCv = async (req, res, next) => {
 
 exports.recommendJops = async (req, res, next) => {
     try {
-      //  const jobSeekerId = req.userId; // Assuming the user ID is stored in the request
-      //  const jobSeeker = await Jopseeker.findById(jobSeekerId);
-
       const cvId = req.params.cvId; // Assuming the user ID is stored in the request
       const cv = await Cv.findById(cvId);
 
@@ -253,10 +250,11 @@ exports.recommendJops = async (req, res, next) => {
             throw error;
         }
 
-        const jobPostsWithIds = jobPosts.map(jobPost => ({
-            _id: jobPost._id,
-            jobDescription: jobPost.jobDescription
-        }));
+        // const jobPostsWithIds = jobPosts.map(jobPost => ({
+        //     _id: jobPost._id,
+        //     jobDescription: jobPost.jobDescription,
+        //     jobPost: jobPost
+        // }));
 
         const allJobDescriptions = jobPosts.map(jobPost => jobPost.jobDescription);
 
@@ -274,7 +272,7 @@ exports.recommendJops = async (req, res, next) => {
         res.status(200).json({
             message: "Skills compared successfully!",
             skillsComparison: response.data,
-            jobPosts: jobPostsWithIds
+            jobPosts: jobPosts
         });
     } catch (error) {
         if (!error.statusCode) {

@@ -283,7 +283,7 @@ exports.recommendCvs = async (req, res, next) => {
         res.status(200).json({
             message: "Post compared successfully!",
             skillsComparison: response.data,
-            cvs: cvsWithSkills
+            cvs: cvs
         });
 
         // //const allJobseekerCv = cvs.map(cv => cv.cvAnalysis.skills);
